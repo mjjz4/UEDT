@@ -1,9 +1,14 @@
-﻿
+﻿using System.Threading;
+using System.IO;
+
 Map myGame = new Map();
+Thread watek = new Thread(myGame.move);
+watek.Start();
 while (true)
 {
     myGame.printMap();
-    myGame.move();
+    
+    Console.Clear();
 }
 
 
@@ -63,7 +68,7 @@ class Map
                     }
                     map[i, j] = "$";
                 }*/
-                else if (i == x & j == y) map[i, j] = "*";
+                else if (i == x & j == y) map[i, j] = ".";
                 else if (i == last_x & j == last_y) map[i, j] = "*";
                 else map[i, j] = " ";
 
@@ -72,27 +77,34 @@ class Map
             }
             Console.Write(Environment.NewLine);
 
+
         }
+    }
+    public void WYSWIETLANIEJEBANEGOOBRAZU()
+    {
+
     }
 
     public void move()
     {
-        last_x = x; last_y = y;
-        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-        if (keyInfo.Key == ConsoleKey.W) x--;
-        if (keyInfo.Key == ConsoleKey.S) x++;
-        if (keyInfo.Key == ConsoleKey.A) y--;
-        if (keyInfo.Key == ConsoleKey.D) y++;
+        while (true)
+        {
+            last_x = x; last_y = y;
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.W) x--;
+            if (keyInfo.Key == ConsoleKey.S) x++;
+            if (keyInfo.Key == ConsoleKey.A) y--;
+            if (keyInfo.Key == ConsoleKey.D) y++;
 
-        //zeby postać nie wychodziła poza obszar tablicy
-        if (x < 1)
-            x = 1;
-        else if (y < 1)
-            y = 1;
-        else if (x > size - 2)
-            x = size - 2;
-        else if (y > size - 2)
-            y = size - 2;
-        Console.Clear();
+            //zeby postać nie wychodziła poza obszar tablicy
+            if (x < 1)
+                x = 1;
+            else if (y < 1)
+                y = 1;
+            else if (x > size - 2)
+                x = size - 2;
+            else if (y > size - 2)
+                y = size - 2;
+        }
     }
 }
