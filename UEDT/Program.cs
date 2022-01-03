@@ -1,5 +1,4 @@
-﻿
-Map myGame = new Map();
+﻿Map myGame = new Map();
 while (true)
 {
     myGame.printMap();
