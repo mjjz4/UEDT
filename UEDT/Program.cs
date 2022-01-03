@@ -7,8 +7,17 @@ watek.Start();
 while (true)
 {
     myGame.printMap();
-    
+    Thread.Sleep(1000);
     Console.Clear();
+    if (watek.IsAlive)
+    {
+        watek.Start();
+    }
+    else
+    {
+        continue;
+    }
+
 }
 
 
@@ -73,11 +82,8 @@ class Map
                 else map[i, j] = " ";
 
                 Console.Write(map[i, j]);
-
             }
             Console.Write(Environment.NewLine);
-
-
         }
     }
     public void WYSWIETLANIEJEBANEGOOBRAZU()
@@ -87,8 +93,6 @@ class Map
 
     public void move()
     {
-        while (true)
-        {
             last_x = x; last_y = y;
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if (keyInfo.Key == ConsoleKey.W) x--;
@@ -105,6 +109,5 @@ class Map
                 x = size - 2;
             else if (y > size - 2)
                 y = size - 2;
-        }
     }
 }
