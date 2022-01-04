@@ -1,9 +1,16 @@
 ﻿using System.Threading;
 using System.IO;
-
+using System.Text;
+using static System.Console;
+using System.Collections.Generic;
 Map myGame = new Map();
+
 Thread watek = new Thread(myGame.move);
-watek.Start();
+string prompt = "Under Elder Doom Tale";
+string[] options = { "Start", "Settings", "Exit" };
+Menu MainMenu = new Menu(prompt, options);
+int selectedIndex = MainMenu.MenuMove();
+/*watek.Start();
 while (true)
 {
     myGame.printMap();
@@ -18,7 +25,7 @@ while (true)
         continue;
     }
 
-}
+}*/
 
 
 //Pobieranie mapy do gry
@@ -86,11 +93,6 @@ class Map
             Console.Write(Environment.NewLine);
         }
     }
-    public void WYSWIETLANIEJEBANEGOOBRAZU()
-    {
-
-    }
-
     public void move()
     {
             last_x = x; last_y = y;
@@ -109,5 +111,70 @@ class Map
                 x = size - 2;
             else if (y > size - 2)
                 y = size - 2;
+    }
+
+}
+
+class Menu
+{
+    private int SelectIndex;
+    private string[] Options;
+    private string Prompt;
+    public Menu(string prompt, string[] options)
+    {
+        Prompt = prompt;
+        Options = options;
+        SelectIndex = 0;
+    }
+
+    public void DisplayOptions()
+    {
+        WriteLine(Prompt);
+        for (int i = 0; i < Options.Length; i++)
+        {
+            string currentOption = Options[i];
+            string prefix;
+
+            if (i == SelectIndex)
+            {
+                prefix = "*";
+                ForegroundColor = ConsoleColor.Black;
+                BackgroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                prefix = " ";
+                ForegroundColor= ConsoleColor.White;
+                BackgroundColor= ConsoleColor.Black;
+            }
+
+            WriteLine($"{prefix}<< {currentOption} >>");
+        }
+        ResetColor();
+    }
+
+    public int MenuMove()
+    {
+        ConsoleKey keyPressed;
+        do
+        {
+            Clear();
+            DisplayOptions();
+
+            ConsoleKeyInfo keyInfo = ReadKey(true);
+            keyPressed = keyInfo.Key;
+            if (keyPressed == ConsoleKey.UpArrow | keyPressed == ConsoleKey.W)
+            {
+                SelectIndex--;
+                if (SelectIndex == -1) SelectIndex = Options.Length - 1;
+            }
+            else if (keyPressed == ConsoleKey.DownArrow | keyPressed == ConsoleKey.S)
+            {
+                SelectIndex++;
+                if (SelectIndex == Options.Length) SelectIndex = 0;
+            }
+        } while (keyPressed != ConsoleKey.Enter);
+
+        return SelectIndex;
     }
 }
