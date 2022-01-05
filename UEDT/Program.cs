@@ -4,13 +4,15 @@ using System.Text;
 using static System.Console;
 using System.Collections.Generic;
 Map myGame = new Map();
-
+Game g = new Game();
 Thread watek = new Thread(myGame.move);
-string prompt = "Under Elder Doom Tale";
-string[] options = { "Start", "Settings", "Exit" };
-Menu MainMenu = new Menu(prompt, options);
-int selectedIndex = MainMenu.MenuMove();
-/*watek.Start();
+g.Start();
+
+/* Daremne próby anty skakani czcionki
+ * |
+ * |
+ * v
+ * watek.Start();
 while (true)
 {
     myGame.printMap();
@@ -27,6 +29,118 @@ while (true)
 
 }*/
 
+class Game
+{
+    public void Start()
+    {
+        Title = "Under Elder Doom Tale";
+        StartMenu();
+    }
+
+    private void StartMenu()
+    {
+        string tytul = @"
+██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗     ███████╗██╗     ██████╗ ███████╗██████╗     ██████╗  ██████╗  ██████╗ ███╗   ███╗    ████████╗ █████╗ ██╗     ███████╗
+██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗    ██╔════╝██║     ██╔══██╗██╔════╝██╔══██╗    ██╔══██╗██╔═══██╗██╔═══██╗████╗ ████║    ╚══██╔══╝██╔══██╗██║     ██╔════╝
+██║   ██║██╔██╗ ██║██║  ██║█████╗  ██████╔╝    █████╗  ██║     ██║  ██║█████╗  ██████╔╝    ██║  ██║██║   ██║██║   ██║██╔████╔██║       ██║   ███████║██║     █████╗  
+██║   ██║██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗    ██╔══╝  ██║     ██║  ██║██╔══╝  ██╔══██╗    ██║  ██║██║   ██║██║   ██║██║╚██╔╝██║       ██║   ██╔══██║██║     ██╔══╝  
+╚██████╔╝██║ ╚████║██████╔╝███████╗██║  ██║    ███████╗███████╗██████╔╝███████╗██║  ██║    ██████╔╝╚██████╔╝╚██████╔╝██║ ╚═╝ ██║       ██║   ██║  ██║███████╗███████╗
+ ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚══════╝╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝     ╚═╝       ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝
+Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu
+";
+        string[] opcje = { "Start", "Opcje", "Wyjście" };
+        Menu MainMenu = new Menu(tytul, opcje);
+        int selectedIndex = MainMenu.MenuMove();
+
+        switch (selectedIndex)
+        {
+            case 0:
+                StartTheGame();
+                break;
+            case 1:
+                Opcje();
+                break;
+            case 2:
+                WriteLine("\n Zamykanie...");
+                Environment.Exit(0);
+                break;
+        }
+    }
+    private void StartTheGame()
+    {
+
+    }
+
+    private void Opcje()
+    {
+
+    }
+
+}
+
+class Menu
+{
+    private int SelectIndex;
+    private string[] Options;
+    private string Prompt;
+    public Menu(string prompt, string[] options)
+    {
+        Prompt = prompt;
+        Options = options;
+        SelectIndex = 0;
+    }
+
+    public void DisplayOptions()
+    {
+        WriteLine(Prompt);
+        for (int i = 0; i < Options.Length; i++)
+        {
+            string currentOption = Options[i];
+            string prefix;
+
+            if (i == SelectIndex)
+            {
+                prefix = "*";
+                ForegroundColor = ConsoleColor.Black;
+                BackgroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                prefix = " ";
+                ForegroundColor = ConsoleColor.White;
+                BackgroundColor = ConsoleColor.Black;
+            }
+
+            WriteLine($"{prefix}<< {currentOption} >>");
+        }
+        ResetColor();
+    }
+
+    public int MenuMove()
+    {
+        ConsoleKey keyPressed;
+        do
+        {
+            Clear();
+            DisplayOptions();
+
+            ConsoleKeyInfo keyInfo = ReadKey(true);
+            keyPressed = keyInfo.Key;
+            if (keyPressed == ConsoleKey.UpArrow | keyPressed == ConsoleKey.W)
+            {
+                SelectIndex--;
+                if (SelectIndex == -1) SelectIndex = Options.Length - 1;
+            }
+            else if (keyPressed == ConsoleKey.DownArrow | keyPressed == ConsoleKey.S)
+            {
+                SelectIndex++;
+                if (SelectIndex == Options.Length) SelectIndex = 0;
+            }
+        } while (keyPressed != ConsoleKey.Enter);
+
+        return SelectIndex;
+    }
+}
 
 //Pobieranie mapy do gry
 class Map
@@ -113,68 +227,4 @@ class Map
                 y = size - 2;
     }
 
-}
-
-class Menu
-{
-    private int SelectIndex;
-    private string[] Options;
-    private string Prompt;
-    public Menu(string prompt, string[] options)
-    {
-        Prompt = prompt;
-        Options = options;
-        SelectIndex = 0;
-    }
-
-    public void DisplayOptions()
-    {
-        WriteLine(Prompt);
-        for (int i = 0; i < Options.Length; i++)
-        {
-            string currentOption = Options[i];
-            string prefix;
-
-            if (i == SelectIndex)
-            {
-                prefix = "*";
-                ForegroundColor = ConsoleColor.Black;
-                BackgroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                prefix = " ";
-                ForegroundColor= ConsoleColor.White;
-                BackgroundColor= ConsoleColor.Black;
-            }
-
-            WriteLine($"{prefix}<< {currentOption} >>");
-        }
-        ResetColor();
-    }
-
-    public int MenuMove()
-    {
-        ConsoleKey keyPressed;
-        do
-        {
-            Clear();
-            DisplayOptions();
-
-            ConsoleKeyInfo keyInfo = ReadKey(true);
-            keyPressed = keyInfo.Key;
-            if (keyPressed == ConsoleKey.UpArrow | keyPressed == ConsoleKey.W)
-            {
-                SelectIndex--;
-                if (SelectIndex == -1) SelectIndex = Options.Length - 1;
-            }
-            else if (keyPressed == ConsoleKey.DownArrow | keyPressed == ConsoleKey.S)
-            {
-                SelectIndex++;
-                if (SelectIndex == Options.Length) SelectIndex = 0;
-            }
-        } while (keyPressed != ConsoleKey.Enter);
-
-        return SelectIndex;
-    }
 }
