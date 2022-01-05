@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
+using Mindmagma.Curses;
 Map myGame = new Map();
 Game g = new Game();
 Thread watek = new Thread(myGame.move);
@@ -28,6 +29,12 @@ while (true)
     }
 
 }*/
+
+// Próba nie migania
+var Screen = NCurses.InitScreen();
+NCurses.NoDelay(Screen, true);
+NCurses.NoEcho();
+//
 
 class Game
 {
