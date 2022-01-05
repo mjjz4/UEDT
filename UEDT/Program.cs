@@ -3,31 +3,10 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
-Map myGame = new Map();
+
+Console.SetWindowSize(211, 50); //ustawia konsole pod git wielkosc
 Game g = new Game();
-Thread watek = new Thread(myGame.move);
 g.Start();
-
-/* Daremne próby anty skakani czcionki
- * |
- * |
- * v
- * watek.Start();
-while (true)
-{
-    myGame.printMap();
-    Thread.Sleep(1000);
-    Console.Clear();
-    if (watek.IsAlive)
-    {
-        watek.Start();
-    }
-    else
-    {
-        continue;
-    }
-
-}*/
 
 class Game
 {
@@ -68,6 +47,14 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
     }
     private void StartTheGame()
     {
+        Console.Clear();
+        Map myGame = new Map();
+        while (true)
+        {
+            myGame.createMap();
+            myGame.renderGame();
+            myGame.move();
+        }
 
     }
 
@@ -145,27 +132,30 @@ class Menu
 //Pobieranie mapy do gry
 class Map
 {
-    int x = 1;
-    int y = 1;
-    bool out_of_bounds = false;
-    int last_x = 1;
-    int last_y = 1;
-    const int size = 20;
-    int level = 0;
+    int x = 1; int y = 1;
+    int last_x = 1; int last_y = 1;
+    bool out_of_bounds = false; 
+    const int size_x = 14; const int size_y = 50;
+    int rotation = 0; string player = "*";
+    int level = 0; 
 
     //mapfile to ścieżka z której będzie pobierana mapa do gry
     //string mapfile;
     //static string[] downloadmap = File.ReadAllLines(@"");
     //string[,] map = new string[downloadmap.Length, downloadmap[0].Length];
-    string[,] map = new string[size, size];
-    public void printMap()
+
+    string[,] map = new string[size_x, size_y];
+    string[,] game = new string[34, 210];
+    string[,] gui = new string[14, 210];
+    public void createMap()
     {
         out_of_bounds = false;
-        string[] loaded_map = File.ReadAllLines(@$"..\..\..\mapa.txt");//..\..\..\labirynt{level}.txt żeby w projekcie odpalać pliki z katalogu projektu a nie net5.0
+        string[] loaded_map = File.ReadAllLines(@$"..\..\..\mapa.txt");
         for (int i = 0; i < map.GetLength(0); i++)
         {
             if (out_of_bounds)
             {
+                map[last_x, last_y] = "*";
                 x = last_x; y = last_y;
                 out_of_bounds = false;
             }
@@ -189,42 +179,131 @@ class Map
                     }
                     map[i, j] = "$";
                 }
-                /*else if (horizontal_segment[j] == '9')
-                {
-                    if (i == x & j == y)
-                    {
-                        map[i, j] = "*";
-                        end_game = true;
-                    }
-                    map[i, j] = "$";
-                }*/
-                else if (i == x & j == y) map[i, j] = ".";
-                else if (i == last_x & j == last_y) map[i, j] = "*";
+                else if (i == x & j == y) map[i, j] = player;
                 else map[i, j] = " ";
-
-                Console.Write(map[i, j]);
             }
-            Console.Write(Environment.NewLine);
         }
     }
     public void move()
     {
-            last_x = x; last_y = y;
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if (keyInfo.Key == ConsoleKey.W) x--;
-            if (keyInfo.Key == ConsoleKey.S) x++;
-            if (keyInfo.Key == ConsoleKey.A) y--;
-            if (keyInfo.Key == ConsoleKey.D) y++;
+        last_x = x; last_y = y;
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+        /*
+        if (keyInfo.Key == ConsoleKey.W) { 
+            x--; }
+        if (keyInfo.Key == ConsoleKey.S) {
+            x++; }
+        if (keyInfo.Key == ConsoleKey.A) {
+            y--; }
+        if (keyInfo.Key == ConsoleKey.D) { 
+            y++; }
+        if (keyInfo.Key == ConsoleKey.W) { player = ">";
+            y++; }
+        if (keyInfo.Key == ConsoleKey.S) { player = "<";
+            y--; }
+        if (keyInfo.Key == ConsoleKey.A) { player = "\u25B2";
+            x--; }
+        if (keyInfo.Key == ConsoleKey.D) { player = "v";
+            x++; }
+        */
+        if (keyInfo.Key == ConsoleKey.RightArrow) { player = ">";
+            rotation = 2; }
+        if (keyInfo.Key == ConsoleKey.LeftArrow) { player = "<";
+            rotation = 3; }
+        if (keyInfo.Key == ConsoleKey.UpArrow) { player = "\u25B2";
+            rotation = 1; }
+        if (keyInfo.Key == ConsoleKey.DownArrow) { player = "v";
+            rotation = 0; }
 
-            //zeby postać nie wychodziła poza obszar tablicy
-            if (x < 1)
+        switch(rotation)
+        {
+            case 2: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    y++;
+                break;
+            }
+            case 3: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    y--;
+                break;
+            }
+            case 1: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    x--;
+                break;
+            }
+            case 0: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    x++;
+                break;
+            }
+            default: break;
+        }
+        
+        //zeby postać nie wychodziła poza obszar tablicy
+        if (x < 1)
                 x = 1;
             else if (y < 1)
                 y = 1;
-            else if (x > size - 2)
-                x = size - 2;
-            else if (y > size - 2)
-                y = size - 2;
+            else if (x > size_x - 2)
+                x = size_x - 2;
+            else if (y > size_y - 2)
+                y = size_y - 2;
+        
+        Console.Clear();
     }
+    public void renderGame()
+    {
+        float a = 0;
+        for (int i = 0; i < game.GetLength(0); i++) //34
+        {
+            for (int j = 0; j < game.GetLength(1); j++)
+            {
+                /*lewa strona*/
+                //lewa górna ściana
+                if ((j > 84 && j < 136) && (i > 5 && i < 25)) game[i, j] = "N";
+                else if (i <= 10 && j <= 30) game[i, j] = "\u2588";
+                else if (i <= 10 && (j > 30 && j <= 30 + i + a)) game[i, j] = "\u2588";
+                //lewa środkowa ściana
+                else if ((i > 10 && i <= 20) && j <= 80) game[i, j] = "\u2588";
+                //lewa dolna ściana
+                else if (i > 20 && j <= 30) game[i, j] = "\u2588";
+                else if (i > 20 && j <= 150 - a) game[i, j] = "\u2588";
 
+                /*prawa strona*/
+                //prawa górna ściana
+                else if (i <= 10 && j >= 210 - 20) game[i, j] = "\u2588";
+                else if (i <= 10 && (j >= (210 - 20) - (a + 9))) game[i, j] = "\u2588";
+                //prawa środkowa
+                else if ((i > 10 && i <= 20) && j >= 210 - 70) game[i, j] = "\u2588";
+                //lewa dolna ściana
+                else if ((i > 20 && i < 30) && j >= 210 - 30) game[i, j] = "\u2588";
+                else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588"; //ząbkowanie tutaj jest strasznie upierdliwe, nie rozumiem czemu ale jakoś zrobiłem to żeby to wyglądało
+
+                else game[i, j] = " ";
+                Console.Write(game[i, j]);
+            }
+            a += 3.5f;
+            Console.Write(Environment.NewLine);
+        }
+        
+
+        for (int i = 0; i < gui.GetLength(0); i++)
+        {
+            for (int j = 0; j < gui.GetLength(1); j++)
+            {
+                if (i == 0 && j < 60 || i > 0 && j < 1 || i == gui.GetLength(0) - 1 && j < 60 || i < gui.GetLength(0) && j==60)
+                    gui[i, j] = "\u2592";
+                else if ((x == i && y == j) || (x + 1 == i && y + 1 == j) || (x + 1 == i && y == j) || (x + 1 == i && y - 1 == j)
+                    || (x - 1 == i && y + 1 == j) || (x == i && y + 1 == j) || (x - 1 == i && y - 1 == j)
+                    || (x - 1 == i && y == j) || (x == i && y - 1 == j))//pole widzenia na mapie (manualne)//j < 50)
+                    gui[i, j] = map[i, j];
+                else
+                    gui[i, j] = "\\";
+                Console.Write(gui[i, j], Encoding.ASCII);
+            }
+            Console.Write(Environment.NewLine);
+        }
+        
+    }
 }
