@@ -4,9 +4,9 @@ using System.Text;
 using static System.Console;
 using System.Collections.Generic;
 using Mindmagma.Curses;
-Map myGame = new Map();
-Game g = new Game();
-Thread watek = new Thread(myGame.move);
+Map myGame = new();
+Game g = new();
+Thread watek = new(myGame.move);
 g.Start();
 
 /* Daremne próby anty skakani czcionki
