@@ -52,9 +52,27 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
         while (true)
         {
             myGame.createMap();
+            if (myGame.IsGameEnded())
+                break;
             myGame.renderGame();
             myGame.move();
         }
+        string koniec_gry_wygrales = @"
+██╗░░██╗░█████╗░███╗░░██╗██╗███████╗░█████╗░  ░██████╗░██████╗░██╗░░░██╗
+██║░██╔╝██╔══██╗████╗░██║██║██╔════╝██╔══██╗  ██╔════╝░██╔══██╗╚██╗░██╔╝
+█████═╝░██║░░██║██╔██╗██║██║█████╗░░██║░░╚═╝  ██║░░██╗░██████╔╝░╚████╔╝░
+██╔═██╗░██║░░██║██║╚████║██║██╔══╝░░██║░░██╗  ██║░░╚██╗██╔══██╗░░╚██╔╝░░
+██║░╚██╗╚█████╔╝██║░╚███║██║███████╗╚█████╔╝  ╚██████╔╝██║░░██║░░░██║░░░
+╚═╝░░╚═╝░╚════╝░╚═╝░░╚══╝╚═╝╚══════╝░╚════╝░  ░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░
+
+░██╗░░░░░░░██╗██╗░░░██╗░██████╗░██████╗░░█████╗░██╗░░░░░███████╗░██████╗
+░██║░░██╗░░██║╚██╗░██╔╝██╔════╝░██╔══██╗██╔══██╗██║░░░░░██╔════╝██╔════╝
+░╚██╗████╗██╔╝░╚████╔╝░██║░░██╗░██████╔╝███████║██║░░░░░█████╗░░╚█████╗░
+░░████╔═████║░░░╚██╔╝░░██║░░╚██╗██╔══██╗██╔══██║██║░░░░░██╔══╝░░░╚═══██╗
+░░╚██╔╝░╚██╔╝░░░░██║░░░╚██████╔╝██║░░██║██║░░██║███████╗███████╗██████╔╝
+░░░╚═╝░░░╚═╝░░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝╚══════╝╚═════╝░
+Gratulacje Wygrałeś!!! "+"\n"+"\n";
+        Console.Write(koniec_gry_wygrales);
 
     }
 
@@ -136,9 +154,10 @@ class Map
     int last_x = 1; int last_y = 1;
     bool out_of_bounds = false; 
     const int size_x = 14; const int size_y = 50;
-    int rotation = 0; string player = "*";
-    int level = 0; 
-
+    int rotation = 0; string player = "v"; //*
+    string sciana = "\u2588"; bool game_over_end;   
+    int level = 0;
+    
     //mapfile to ścieżka z której będzie pobierana mapa do gry
     //string mapfile;
     //static string[] downloadmap = File.ReadAllLines(@"");
@@ -155,7 +174,7 @@ class Map
         {
             if (out_of_bounds)
             {
-                map[last_x, last_y] = "*";
+                map[last_x, last_y] = player;//"*";
                 x = last_x; y = last_y;
                 out_of_bounds = false;
             }
@@ -173,16 +192,29 @@ class Map
                 {
                     if (i == x & j == y)
                     {
-                        map[i, j] = "*";
+                        //map[i, j] = "*";
                         level += 1;
                         x = 1; y = 1;
                     }
                     map[i, j] = "$";
                 }
+                else if (horizontal_segment[j] == '9')
+                {
+                    if (i == x & j == y)
+                    {
+                        //map[i, j] = "*";
+                        game_over_end = true;
+                    }
+                    map[i, j] = "W";
+                }
                 else if (i == x & j == y) map[i, j] = player;
                 else map[i, j] = " ";
             }
         }
+    }
+    public bool IsGameEnded()
+    {
+        return game_over_end;
     }
     public void move()
     {
@@ -255,13 +287,31 @@ class Map
     public void renderGame()
     {
         float a = 0;
+        int test = 0;
         for (int i = 0; i < game.GetLength(0); i++) //34
         {
             for (int j = 0; j < game.GetLength(1); j++)
             {
+                //Rysowanie Rzeczy przed graczem
+                if ((j > 80 && j < 140) && (i > 7 && i < 23))
+                {
+                    //ściana przed graczem
+                    if (rotation==2 && map[x, y+1] == sciana || rotation == 3 && map[x, y - 1] == sciana 
+                        || rotation == 1 && map[x-1, y] == sciana || rotation == 0 && map[x + 1, y] == sciana)
+                        game[i, j] = "\u2593"; //Niemogłem się zdecydować jak rysować ściane przed nami, jak był ten sam znak co przy perspektywnie tak sobie to wyglądało
+                    else if ((rotation == 2 && map[x, y + 1] == "W" || rotation == 3 && map[x, y - 1] == "W"
+                        || rotation == 1 && map[x - 1, y] == "W" || rotation == 0 && map[x + 1, y] == "W")) {
+                        if ((j > 100 && j < 120) && i > 12)
+                            game[i, j] = " ";
+                        else
+                            game[i, j] = "#";
+                    }
+                    else
+                        game[i, j] = " ";
+                    test++;
+                }
                 /*lewa strona*/
                 //lewa górna ściana
-                if ((j > 84 && j < 136) && (i > 5 && i < 25)) game[i, j] = "N";
                 else if (i <= 10 && j <= 30) game[i, j] = "\u2588";
                 else if (i <= 10 && (j > 30 && j <= 30 + i + a)) game[i, j] = "\u2588";
                 //lewa środkowa ściana
@@ -278,11 +328,12 @@ class Map
                 else if ((i > 10 && i <= 20) && j >= 210 - 70) game[i, j] = "\u2588";
                 //lewa dolna ściana
                 else if ((i > 20 && i < 30) && j >= 210 - 30) game[i, j] = "\u2588";
-                else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588"; //ząbkowanie tutaj jest strasznie upierdliwe, nie rozumiem czemu ale jakoś zrobiłem to żeby to wyglądało
+                else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588"; 
 
                 else game[i, j] = " ";
                 Console.Write(game[i, j]);
             }
+            test = 0;
             a += 3.5f;
             Console.Write(Environment.NewLine);
         }
