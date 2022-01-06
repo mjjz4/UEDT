@@ -287,7 +287,6 @@ class Map
     public void renderGame()
     {
         float a = 0;
-        int test = 0;
         for (int i = 0; i < game.GetLength(0); i++) //34
         {
             for (int j = 0; j < game.GetLength(1); j++)
@@ -308,7 +307,6 @@ class Map
                     }
                     else
                         game[i, j] = " ";
-                    test++;
                 }
                 /*lewa strona*/
                 //lewa górna ściana
@@ -333,7 +331,6 @@ class Map
                 else game[i, j] = " ";
                 Console.Write(game[i, j]);
             }
-            test = 0;
             a += 3.5f;
             Console.Write(Environment.NewLine);
         }
