@@ -3,11 +3,20 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
+
 SetWindowSize(211, 50); //ustawia konsole pod git wielkosc
 Game g = new Game();
 g.Start();
 
-class Game
+abstract class AGame
+{
+    public virtual void Start() { }
+    public virtual void StartMenu() { }
+    public virtual void StartTheGame() { }
+    public virtual void Opcje() { }
+}
+
+class Game : AGame
 {
     public void Start()
     {
