@@ -15,6 +15,7 @@ interface IGame
     private void StartMenu() { }
     private void StartTheGame() { }
     private void Opcje() { }
+    private void Music() { }
 }
 // Główna klasa gry
 class Game : IGame
@@ -38,12 +39,9 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
 ";
         string[] opcje = { "Start", "Opcje", "Wyjście" };
         Menu MainMenu = new Menu(tytul, opcje);
-        // Muzyka
-        SoundPlayer SoundPlayer = new SoundPlayer();
-        SoundPlayer.SoundLocation = @"..\..\..\m1.wav";
-        SoundPlayer.PlayLooping();
 
         int selectedIndex = MainMenu.MenuMove();
+        Music();
 
         switch (selectedIndex)
         {
@@ -96,7 +94,13 @@ Gratulacje Wygrałeś!!! "+"\n"+"\n";
     {
 
     }
-
+    // Muzyka
+    private void Music()
+    {
+        SoundPlayer SoundPlayer = new SoundPlayer();
+        SoundPlayer.SoundLocation = @"..\..\..\m1.wav";
+        SoundPlayer.PlayLooping();
+    }
 }
 
 class Menu
