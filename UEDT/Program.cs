@@ -3,20 +3,21 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
-
+using System.Media;
 SetWindowSize(211, 50); //ustawia konsole pod git wielkosc
 Game g = new Game();
 g.Start();
 
-abstract class AGame
+// Interfejs
+interface IGame
 {
-    public virtual void Start() { }
-    public virtual void StartMenu() { }
-    public virtual void StartTheGame() { }
-    public virtual void Opcje() { }
+    public void Start() { }
+    private void StartMenu() { }
+    private void StartTheGame() { }
+    private void Opcje() { }
 }
-
-class Game : AGame
+// Główna klasa gry
+class Game : IGame
 {
     public void Start()
     {
@@ -37,6 +38,11 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
 ";
         string[] opcje = { "Start", "Opcje", "Wyjście" };
         Menu MainMenu = new Menu(tytul, opcje);
+        // Muzyka
+        SoundPlayer SoundPlayer = new SoundPlayer();
+        SoundPlayer.SoundLocation = @"..\..\..\m1.wav";
+        SoundPlayer.PlayLooping();
+
         int selectedIndex = MainMenu.MenuMove();
 
         switch (selectedIndex)
@@ -230,7 +236,7 @@ class Map
     {
         SetCursorPosition(0, 0);
         last_x = x; last_y = y;
-        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+        ConsoleKeyInfo keyInfo = ReadKey(true);
         /*
         if (keyInfo.Key == ConsoleKey.W) { 
             x--; }
@@ -339,10 +345,10 @@ class Map
                 else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588"; 
 
                 else game[i, j] = " ";
-                Console.Write(game[i, j]);
+                Write(game[i, j]);
             }
             a += 3.5f;
-            Console.Write(Environment.NewLine);
+            Write(Environment.NewLine);
         }
         
 
@@ -358,9 +364,9 @@ class Map
                     gui[i, j] = map[i, j];
                 else
                     gui[i, j] = "\\";
-                Console.Write(gui[i, j], Encoding.ASCII);
+                Write(gui[i, j], Encoding.ASCII);
             }
-            Console.Write(Environment.NewLine);
+            Write(Environment.NewLine);
         }
         
     }
