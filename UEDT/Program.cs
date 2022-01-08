@@ -3,44 +3,36 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
-using System.Media;
 SetWindowSize(211, 50); //ustawia konsole pod git wielkosc
-// Program startujący oraz obsługa wyjątków
-try
+Game g = new Game();
+g.Start();
+
+class Game
 {
-    Game g = new Game();
-    g.Start();
-}
-catch (FileNotFoundException)
-{
-    Clear();
-    WriteLine("Brak pliku");
-}
-catch (Exception ex)
-{
-    Clear();
-    WriteLine(ex.ToString());
-}
-// Interfejs
-interface IGame
-{
-    public void Start() { }
-    private void StartMenu() { }
-    private void StartTheGame() { }
-    private void Opcje() { }
-    private void Music() { }
-}
-// Główna klasa gry
-class Game : IGame
-{
+    int kolor;
     public void Start()
     {
         Title = "Under Elder Doom Tale";
-        StartMenu();
+        StartMenu(0);
     }
 
-    private void StartMenu()
+    private void StartMenu(int kolor)
     {
+        switch (kolor)
+        {
+            case 0:
+                ForegroundColor = ConsoleColor.White;
+                break;
+            case 1:
+                ForegroundColor = ConsoleColor.Green;
+                break;
+            case 2:
+                ForegroundColor = ConsoleColor.DarkYellow;
+                break;
+            case 3:
+                ForegroundColor = ConsoleColor.Red;
+                break;
+        }
         string tytul = @"
 ██╗   ██╗███╗   ██╗██████╗ ███████╗██████╗     ███████╗██╗     ██████╗ ███████╗██████╗     ██████╗  ██████╗  ██████╗ ███╗   ███╗    ████████╗ █████╗ ██╗     ███████╗
 ██║   ██║████╗  ██║██╔══██╗██╔════╝██╔══██╗    ██╔════╝██║     ██╔══██╗██╔════╝██╔══██╗    ██╔══██╗██╔═══██╗██╔═══██╗████╗ ████║    ╚══██╔══╝██╔══██╗██║     ██╔════╝
@@ -52,9 +44,7 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
 ";
         string[] opcje = { "Start", "Opcje", "Wyjście" };
         Menu MainMenu = new Menu(tytul, opcje);
-
-        int selectedIndex = MainMenu.MenuMove();
-        Music();
+        int selectedIndex = MainMenu.MenuMove(kolor);
 
         switch (selectedIndex)
         {
@@ -62,7 +52,8 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
                 StartTheGame();
                 break;
             case 1:
-                Opcje();
+                kolor = Opcje(kolor);
+                StartMenu(kolor);
                 break;
             case 2:
                 WriteLine("\n Zamykanie...");
@@ -73,7 +64,7 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
     private void StartTheGame()
     {
         Console.Clear();
-        Map myGame = new();
+        Map myGame = new Map();
         while (true)
         {
             myGame.createMap();
@@ -89,35 +80,49 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
 ██╔═██╗░██║░░██║██║╚████║██║██╔══╝░░██║░░██╗  ██║░░╚██╗██╔══██╗░░╚██╔╝░░
 ██║░╚██╗╚█████╔╝██║░╚███║██║███████╗╚█████╔╝  ╚██████╔╝██║░░██║░░░██║░░░
 ╚═╝░░╚═╝░╚════╝░╚═╝░░╚══╝╚═╝╚══════╝░╚════╝░  ░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░
+
 ░██╗░░░░░░░██╗██╗░░░██╗░██████╗░██████╗░░█████╗░██╗░░░░░███████╗░██████╗
 ░██║░░██╗░░██║╚██╗░██╔╝██╔════╝░██╔══██╗██╔══██╗██║░░░░░██╔════╝██╔════╝
 ░╚██╗████╗██╔╝░╚████╔╝░██║░░██╗░██████╔╝███████║██║░░░░░█████╗░░╚█████╗░
 ░░████╔═████║░░░╚██╔╝░░██║░░╚██╗██╔══██╗██╔══██║██║░░░░░██╔══╝░░░╚═══██╗
 ░░╚██╔╝░╚██╔╝░░░░██║░░░╚██████╔╝██║░░██║██║░░██║███████╗███████╗██████╔╝
 ░░░╚═╝░░░╚═╝░░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝╚══════╝╚═════╝░
-Gratulacje Wygrałeś!!! " + "\n" + "\n";
+Gratulacje Wygrałeś!!! "+"\n"+"\n";
         Clear();
         SetCursorPosition(0, 0);
         Write(koniec_gry_wygrales);
+
     }
 
-    private void Opcje()
+    private int Opcje(int kolor)
     {
+        string prompt = "Wybierz poziom trudności";
+        string[] options = { "Demo", "Łatwy", "Średni", "Trudny" };
+        Menu colorMenu= new Menu(prompt, options);
+        int selectIndex = colorMenu.MenuMove(kolor);
 
+        switch (selectIndex)
+        {
+            case 0:
+                Console.Clear();
+                return 0;
+            case 1:
+                Console.Clear();
+                return 1;
+            case 2:
+                Console.Clear();
+                return 2;
+            case 3:
+                Console.Clear();
+                return 3;
+            default:
+                return 0;
+        }
     }
-    // Muzyka
-    private void Music()
-    {
-        #pragma warning disable CA1416 // Walidacja zgodności z platformą
-        SoundPlayer SoundPlayer = new();
-        SoundPlayer.SoundLocation = @"..\..\..\m1.wav";
-        SoundPlayer.PlayLooping();
-        #pragma warning restore CA1416 // Walidacja zgodności z platformą
 
-    }
 }
 
-class Menu
+class Menu : Game
 {
     private int SelectIndex;
     private string[] Options;
@@ -129,8 +134,23 @@ class Menu
         SelectIndex = 0;
     }
 
-    public void DisplayOptions()
+    public void DisplayOptions(int kolor)
     {
+        switch (kolor)
+        {
+            case 0:
+                ForegroundColor = ConsoleColor.White;
+                break;
+            case 1:
+                ForegroundColor = ConsoleColor.Green;
+                break;
+            case 2:
+                ForegroundColor = ConsoleColor.DarkYellow;
+                break;
+            case 3:
+                ForegroundColor = ConsoleColor.Red;
+                break;
+        }
         SetCursorPosition(0, 0);
         WriteLine(Prompt);
         for (int i = 0; i < Options.Length; i++)
@@ -150,18 +170,18 @@ class Menu
                 ForegroundColor = ConsoleColor.White;
                 BackgroundColor = ConsoleColor.Black;
             }
-            SetCursorPosition(0, i + 9);
+            SetCursorPosition(0, i+9);
             WriteLine($"{prefix}<< {currentOption} >>");
         }
         ResetColor();
     }
 
-    public int MenuMove()
+    public int MenuMove(int kolor)
     {
         ConsoleKey keyPressed;
         do
         {
-            DisplayOptions();
+            DisplayOptions(kolor);
 
             ConsoleKeyInfo keyInfo = ReadKey(true);
             keyPressed = keyInfo.Key;
@@ -186,12 +206,12 @@ class Map
 {
     int x = 1; int y = 1;
     int last_x = 1; int last_y = 1;
-    bool out_of_bounds = false;
+    bool out_of_bounds = false; 
     const int size_x = 14; const int size_y = 50;
     int rotation = 0; string player = "v"; //*
-    string sciana = "\u2588"; bool game_over_end;
+    string sciana = "\u2588"; bool game_over_end;   
     int level = 0;
-
+    
     //mapfile to ścieżka z której będzie pobierana mapa do gry
     //string mapfile;
     //static string[] downloadmap = File.ReadAllLines(@"");
@@ -254,7 +274,7 @@ class Map
     {
         SetCursorPosition(0, 0);
         last_x = x; last_y = y;
-        ConsoleKeyInfo keyInfo = ReadKey(true);
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
         /*
         if (keyInfo.Key == ConsoleKey.W) { 
             x--; }
@@ -273,66 +293,50 @@ class Map
         if (keyInfo.Key == ConsoleKey.D) { player = "v";
             x++; }
         */
-        if (keyInfo.Key == ConsoleKey.RightArrow)
-        {
-            player = ">";
-            rotation = 2;
-        }
-        if (keyInfo.Key == ConsoleKey.LeftArrow)
-        {
-            player = "<";
-            rotation = 3;
-        }
-        if (keyInfo.Key == ConsoleKey.UpArrow)
-        {
-            player = "\u25B2";
-            rotation = 1;
-        }
-        if (keyInfo.Key == ConsoleKey.DownArrow)
-        {
-            player = "v";
-            rotation = 0;
-        }
+        if (keyInfo.Key == ConsoleKey.RightArrow) { player = ">";
+            rotation = 2; }
+        if (keyInfo.Key == ConsoleKey.LeftArrow) { player = "<";
+            rotation = 3; }
+        if (keyInfo.Key == ConsoleKey.UpArrow) { player = "\u25B2";
+            rotation = 1; }
+        if (keyInfo.Key == ConsoleKey.DownArrow) { player = "v";
+            rotation = 0; }
 
-        switch (rotation)
+        switch(rotation)
         {
-            case 2:
-                {
-                    if (keyInfo.Key == ConsoleKey.W)
-                        y++;
-                    break;
-                }
-            case 3:
-                {
-                    if (keyInfo.Key == ConsoleKey.W)
-                        y--;
-                    break;
-                }
-            case 1:
-                {
-                    if (keyInfo.Key == ConsoleKey.W)
-                        x--;
-                    break;
-                }
-            case 0:
-                {
-                    if (keyInfo.Key == ConsoleKey.W)
-                        x++;
-                    break;
-                }
+            case 2: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    y++;
+                break;
+            }
+            case 3: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    y--;
+                break;
+            }
+            case 1: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    x--;
+                break;
+            }
+            case 0: {
+                if (keyInfo.Key == ConsoleKey.W)
+                    x++;
+                break;
+            }
             default: break;
         }
-
+        
         //zeby postać nie wychodziła poza obszar tablicy
         if (x < 1)
-            x = 1;
-        else if (y < 1)
-            y = 1;
-        else if (x > size_x - 2)
-            x = size_x - 2;
-        else if (y > size_y - 2)
-            y = size_y - 2;
-
+                x = 1;
+            else if (y < 1)
+                y = 1;
+            else if (x > size_x - 2)
+                x = size_x - 2;
+            else if (y > size_y - 2)
+                y = size_y - 2;
+        
     }
     public void renderGame()
     {
@@ -345,12 +349,11 @@ class Map
                 if ((j > 80 && j < 140) && (i > 7 && i < 23))
                 {
                     //ściana przed graczem
-                    if (rotation == 2 && map[x, y + 1] == sciana || rotation == 3 && map[x, y - 1] == sciana
-                        || rotation == 1 && map[x - 1, y] == sciana || rotation == 0 && map[x + 1, y] == sciana)
+                    if (rotation==2 && map[x, y+1] == sciana || rotation == 3 && map[x, y - 1] == sciana 
+                        || rotation == 1 && map[x-1, y] == sciana || rotation == 0 && map[x + 1, y] == sciana)
                         game[i, j] = "\u2593"; //Niemogłem się zdecydować jak rysować ściane przed nami, jak był ten sam znak co przy perspektywnie tak sobie to wyglądało
                     else if ((rotation == 2 && map[x, y + 1] == "W" || rotation == 3 && map[x, y - 1] == "W"
-                        || rotation == 1 && map[x - 1, y] == "W" || rotation == 0 && map[x + 1, y] == "W"))
-                    {
+                        || rotation == 1 && map[x - 1, y] == "W" || rotation == 0 && map[x + 1, y] == "W")) {
                         if ((j > 100 && j < 120) && i > 12)
                             game[i, j] = " ";
                         else
@@ -377,21 +380,21 @@ class Map
                 else if ((i > 10 && i <= 20) && j >= 210 - 70) game[i, j] = "\u2588";
                 //lewa dolna ściana
                 else if ((i > 20 && i < 30) && j >= 210 - 30) game[i, j] = "\u2588";
-                else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588";
+                else if (i > 20 && j >= 51 + (a * 1.25)) game[i, j] = "\u2588"; 
 
                 else game[i, j] = " ";
-                Write(game[i, j]);
+                Console.Write(game[i, j]);
             }
             a += 3.5f;
-            Write(Environment.NewLine);
+            Console.Write(Environment.NewLine);
         }
-
+        
 
         for (int i = 0; i < gui.GetLength(0); i++)
         {
             for (int j = 0; j < gui.GetLength(1); j++)
             {
-                if (i == 0 && j < 60 || i > 0 && j < 1 || i == gui.GetLength(0) - 1 && j < 60 || i < gui.GetLength(0) && j == 60)
+                if (i == 0 && j < 60 || i > 0 && j < 1 || i == gui.GetLength(0) - 1 && j < 60 || i < gui.GetLength(0) && j==60)
                     gui[i, j] = "\u2592";
                 else if ((x == i && y == j) || (x + 1 == i && y + 1 == j) || (x + 1 == i && y == j) || (x + 1 == i && y - 1 == j)
                     || (x - 1 == i && y + 1 == j) || (x == i && y + 1 == j) || (x - 1 == i && y - 1 == j)
@@ -399,10 +402,10 @@ class Map
                     gui[i, j] = map[i, j];
                 else
                     gui[i, j] = "\\";
-                Write(gui[i, j], Encoding.ASCII);
+                Console.Write(gui[i, j], Encoding.ASCII);
             }
-            Write(Environment.NewLine);
+            Console.Write(Environment.NewLine);
         }
-
+        
     }
 }
