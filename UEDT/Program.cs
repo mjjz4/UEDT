@@ -3,11 +3,33 @@ using System.IO;
 using System.Text;
 using static System.Console;
 using System.Collections.Generic;
+using System.Media;
 SetWindowSize(211, 50); //ustawia konsole pod git wielkosc
-Game g = new Game();
-g.Start();
-
-class Game
+try
+{
+    Game g = new Game();
+    g.Start();
+}
+catch (FileNotFoundException)
+{
+    Clear();
+    WriteLine("Brak pliku");
+}
+catch (Exception ex)
+{
+    Clear();
+    WriteLine(ex.ToString());
+}
+// Interfejs
+interface IGame
+{
+    public void Start() { }
+    private void StartMenu() { }
+    private void StartTheGame() { }
+    private void Opcje() { }
+    private void Music() { }
+}
+class Game : IGame
 {
     int kolor;
     public void Start()
@@ -45,7 +67,7 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
         string[] opcje = { "Start", "Opcje", "Wyjście" };
         Menu MainMenu = new Menu(tytul, opcje);
         int selectedIndex = MainMenu.MenuMove(kolor);
-
+        Music();
         switch (selectedIndex)
         {
             case 0:
@@ -119,7 +141,16 @@ Gratulacje Wygrałeś!!! "+"\n"+"\n";
                 return 0;
         }
     }
+    // Muzyka
+    private void Music()
+    {
+#pragma warning disable CA1416 // Walidacja zgodności z platformą
+        SoundPlayer SoundPlayer = new();
+        SoundPlayer.SoundLocation = @"..\..\..\m1.wav";
+        SoundPlayer.PlayLooping();
+#pragma warning restore CA1416 // Walidacja zgodności z platformą
 
+    }
 }
 
 class Menu : Game
