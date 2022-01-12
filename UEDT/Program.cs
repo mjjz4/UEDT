@@ -31,15 +31,16 @@ interface IGame
 }
 class Game : IGame
 {
-    int kolor;
+    public int kolor;
     public void Start()
     {
         Title = "Under Elder Doom Tale";
         StartMenu(0);
     }
 
-    private void StartMenu(int kolor)
+    private void StartMenu(int kolorek)
     {
+        kolor = kolorek;
         switch (kolor)
         {
             case 0:
@@ -71,7 +72,7 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
         switch (selectedIndex)
         {
             case 0:
-                StartTheGame();
+                StartTheGame(kolor);
                 break;
             case 1:
                 kolor = Opcje(kolor);
@@ -83,13 +84,13 @@ Witaj w UEDT użyj 'W'\'S' lub strzałek '^'\'v' żeby poruszać się po menu or
                 break;
         }
     }
-    private void StartTheGame()
+    private void StartTheGame(int mapa)
     {
         Console.Clear();
         Map myGame = new Map();
         while (true)
         {
-            myGame.createMap();
+            myGame.createMap(mapa);
             if (myGame.IsGameEnded())
                 break;
             myGame.renderGame();
@@ -251,10 +252,11 @@ class Map
     string[,] map = new string[size_x, size_y];
     string[,] game = new string[34, 210];
     string[,] gui = new string[14, 210];
-    public void createMap()
+    public void createMap(int mapa)
     {
+        level = mapa;
         out_of_bounds = false;
-        string[] loaded_map = File.ReadAllLines(@$"..\..\..\mapa.txt");
+        string[] loaded_map = File.ReadAllLines(@$"..\..\..\mapa{level}.txt");
         for (int i = 0; i < map.GetLength(0); i++)
         {
             if (out_of_bounds)
